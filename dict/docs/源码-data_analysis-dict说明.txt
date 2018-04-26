@@ -1,0 +1,62 @@
+### 功能
+进行基于字典的情感分析
+
+### 目录结构
+
+LoadDict.py
+	load_pos()	加载褒义词
+	load_neg()	加载贬义词
+	load_point()	加载观点词
+	load_beta()	加载程度词
+
+ScoreDict.py
+	Fenci()         分词去停词处理
+	Score()         单个文本的得分
+	MakeScore()
+		Make_it() 进行打分
+	get_label()     基于打分得到正面负面中性
+	store()         存储输出结果
+
+
+### 使用例子
+
+import LoadDict
+import ScoreDict
+import pandas as pd
+
+
+# 输入测试数据
+test_path = r'E:\job\正负分类\dict\input/test.xlsx'
+tt = pd.read_excel(test_path)
+test = tt['内容'] 
+
+# 载入数据字典
+a = LoadDict.MakeDict()
+pos = a.load_pos()
+neg = a.load_neg()
+point = a.load_point()
+beta = a.load_beta()
+stop = a.stop_dict
+
+
+# 分词处理
+fc = ScoreDict.Fenci(test, stop)
+
+# 进行打分
+c = ScoreDict.MakeScore()
+c.dict_neg = neg
+c.dict_pos = pos
+c.dict_point = point
+c.dict_beta = beta
+c.fc = fc
+
+# 开始进行
+aaa = c.Make_it()
+
+# 标签--> 输出正面，负面，中性
+ggg = ScoreDict.get_label(aaa)
+
+
+# 输出文件
+ScoreDict.store(ggg, tt, '正负中')
+
