@@ -5,11 +5,10 @@
 '''
 
 
-from gensim import corpora,models,similarities
+from gensim import corpora, models, similarities
 from most_freq import flatten_str
 import nltk
 from prepare import removeStop
-
 
 def rm_stop_sim(test):
     '''
@@ -24,43 +23,44 @@ def rm_stop_sim(test):
     rm_s = rm.remove_stoplist()
     return rm_s
 
+
 def make_today(nlp_data):
     '''
 
-    :param nlp_data:
+    :param nlp_data:去除停词之后的[[a],[b],[c]]
     :return:
     '''
-    today_doc = [rm_stop_sim(i) for i in nlp_data]
-    dictionary = corpora.Dictionary(today_doc)
-    corpus = [dictionary.doc2bow(i) for i in today_doc]
+    dictionary = corpora.Dictionary(nlp_data)
+    corpus = [dictionary.doc2bow(i) for i in nlp_data]
     tfidf = models.TfidfModel(corpus)
-    tfidf_cor = tfidf[corpus]
-    return tfidf_cor, tfidf, corpus
 
-
-def lsi_matrix(nlp_data):
-    '''
-
-    :param nlp_data:
-    :return:
-    '''
-    tfidf_cor, tfidf, corpus = make_today(nlp_data)
     tfidf_for_lsi = tfidf[corpus]
-    lsi = models.LsiModel(tfidf_for_lsi, num_topics=len(tfidf_cor))
+    lsi = models.LsiModel(tfidf_for_lsi, id2word=dictionary,num_topics=200)
     index = similarities.MatrixSimilarity(lsi[corpus])
-    return index
+
+    # 这个要封装在前面的公式里现在还没有进行
+    out = []
+    articled = []
+    print("...")
+    for i in range(tfidf_for_lsi.__len__()):
+        sim = index[lsi[tfidf_for_lsi[i]]]
+        position, art_count = get_(sim)
+        out.append(position)
+        articled.append(art_count)
+    return out, articled
+
 
 
 def get_(sim):
     '''
-    
+
     :param sim:
     :return:
     '''
     # 0.25
     res = sorted(enumerate(sim), key=lambda item: -item[1])
     rule = res[1:]
-    like = [i for i in rule if i[1] > 0.3]
+    like = [i for i in rule if i[1] > 0.7]
     if like:
         count_sim = int(len(like))
         out = [i[0] for i in like]
@@ -70,18 +70,8 @@ def get_(sim):
     return out, count_sim
 
 
-index = lsi_matrix(nlp_data=nlp_data)
 
-# 这个要封装在前面的公式里现在还没有进行
-out = []
-article = []
-print("...")
-for i in range(tfidf_for_lsi.__len__()):
-    sim = index[lsi[tfidf_for_lsi[i]]]
-    position, art_count = get_(sim)
-    out.append(position)
-    article.append(art_count)
-
+out, article1 = make_today(filtered2)
 
 def where_sim(out):
     res = []
@@ -94,5 +84,26 @@ def where_sim(out):
         res.append(temp)
     return res
 
-
 sim_where = where_sim(out)
+
+
+
+where = list(zip(iid, content))
+
+
+def find_iid(out):
+    id_where = []
+    for i in out:
+        if i == 0:
+            one_id = "have nothing"
+        else:
+            one_id = str()
+            for j in i:
+                print(j)
+                iid2 = str(where[j][0])
+                one_id += iid2 + ","
+        id_where.append(one_id)
+    return id_where
+
+
+id_find = find_iid(out)

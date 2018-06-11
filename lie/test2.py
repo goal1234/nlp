@@ -31,6 +31,8 @@ def ff(tokens):
         filtered2.append(fi)
     return filtered2
 
+
+
 filtered2 = ff(tokens)
 
 top5 = [most_freq(i) for i in filtered2]
@@ -66,6 +68,7 @@ state=[i[2] for i in get_pls]
 
 '''
 
+'''
 res_person = []
 res_location =[]
 for i in filtered2:
@@ -74,6 +77,16 @@ for i in filtered2:
     location = aaa.get_loaction()
     res_person.append(person)
     res_location.append(location)
+
+'''
+
+# ---spacy版本
+res_person = []
+res_location = []
+
+
+
+
 
 
 # ---

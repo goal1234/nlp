@@ -2,6 +2,26 @@ import nltk
 from nltk.corpus import stopwords
 
 
+def remove_stoplist(tokens, stop1):
+    a = ['``', '»', '«', '–', 'm', 'I', 'Ms.']
+    filtered = [w for w in tokens if w not in stopwords.words('english')]
+    filtered = [w for w in filtered if w not in stop1]
+    filtered = [w for w in filtered if w not in a]
+    return filtered
+
+def stopwordslist(path):
+    '''
+    各种标点符号
+    :param filepath:文件路径
+    :return:
+    '''
+    try:
+        stopwords = [line.strip() for line in open(path, 'r').readlines()]
+    except Exception as e:
+        print("检查的的文件路径在path上")
+    return stopwords
+
+
 class removeStop():
     def __init__(self, str_input, path):
         self.path = path
